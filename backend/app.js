@@ -10,6 +10,7 @@ const Staff = require("./models/staffModel");
 const Orders=require("./models/ordersModel");
 const adminauthRoutes=require("./routes/adminauthRoutes");
 const emailRoutes=require("./routes/emailRoutes");
+const orderUpdateRoute=require("./routes/orderUpdateRoute");
 
 const stripe = require("stripe")(
   "pk_test_51Q4ekwGfQYqZiDkV7tF6Q51ecYxNZG3YtzW2i8Jsol4rD8t6bsKbzgxvVUnW6E5nQr5jCUkoeVGcMAhs0YA90VKi00TSrYGcyg"
@@ -56,6 +57,7 @@ mongoose
 app.use("/api/auth", authRoutes);
 app.use("/api/adminauth",adminauthRoutes);
 app.use("/api/orderEmail",emailRoutes);
+app.use("/api/updateorders",orderUpdateRoute);
 
 // /api/auth/register
 app.get("/", (req, res) => {
