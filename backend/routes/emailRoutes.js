@@ -56,5 +56,20 @@ router.post('/send-reject-email', async (req, res) => {
     res.status(500).json({ message: 'Failed to send rejection email.' });
   }
 });
+router.post('/send-prepared-email', async (req, res) => {
+  const { userEmail, orderID } = req.body;
+
+  try {
+    await sendMail(
+      userEmail,
+      'Order Prepared',
+      `Your order with ID ${orderID} has been prepared and is ready for collection from canteen.`
+    );
+    res.status(200).json({ message: 'Preparation email sent successfully.' });
+  } catch (error) {
+    console.error('Error sending preparation email:', error);
+    res.status(500).json({ message: 'Failed to send preparation email.' });
+  }
+});
 
 module.exports = router;
