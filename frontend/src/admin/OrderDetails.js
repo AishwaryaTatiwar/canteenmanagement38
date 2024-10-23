@@ -28,29 +28,95 @@ const OrderDetails = () => {
     fetchOrders();
   }, []);
 
-  // Function to send acceptance email
+  // Function to send acceptance email and update order status
   const handleAccept = async (userEmail, orderID) => {
     try {
+      // Send email notification
       await axios.post('http://localhost:8283/api/orderEmail/send-accept-email', {
         userEmail,
         orderID,
       });
-      alert('Acceptance email sent.');
+
+      // Update the order status to "inpreparation"
+      await axios.put(`http://localhost:8283/api/updateorders/${orderID}`, {
+        orderStatus: 'inpreparation',
+      });
+
+      // Update the local state to reflect the change in status
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.orderID === orderID ? { ...order, orderStatus: 'inpreparation' } : order
+        )
+      );
+
+      alert('Acceptance email sent and order status updated.');
     } catch (error) {
-      console.error('Error sending acceptance email:', error);
+      console.error('Error accepting order:', error);
     }
   };
 
-  // Function to send rejection email
+  // Function to send rejection email and update order status
   const handleReject = async (userEmail, orderID) => {
     try {
+      // Send rejection email notification
       await axios.post('http://localhost:8283/api/orderEmail/send-reject-email', {
         userEmail,
         orderID,
       });
-      alert('Rejection email sent.');
+
+      // Update the order status to "cancelled"
+      await axios.put(`http://localhost:8283/api/updateorders/${orderID}`, {
+        orderStatus: 'cancelled',
+      });
+
+      // Update the local state to reflect the change in status
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.orderID === orderID ? { ...order, orderStatus: 'cancelled' } : order
+        )
+      );
+
+      alert('Rejection email sent and order status updated.');
     } catch (error) {
-      console.error('Error sending rejection email:', error);
+      console.error('Error rejecting order:', error);
+    }
+  };
+
+  // Function to handle prepared status update
+  // Function to handle prepared status update
+const handlePrepared = async (orderID, userEmail) => {
+  try {
+    // Send preparation notification email
+    await axios.post('http://localhost:8283/api/orderEmail/send-prepared-email', {
+      userEmail,
+      orderID,
+    });
+
+    alert('Notification sent to the user regarding order preparation.');
+  } catch (error) {
+    console.error('Error sending prepared notification:', error);
+  }
+};
+
+
+  // Function to handle delivered status update
+  const handleDelivered = async (orderID) => {
+    try {
+      // Update the order status to "delivered"
+      await axios.put(`http://localhost:8283/api/updateorders/${orderID}`, {
+        orderStatus: 'delivered',
+      });
+
+      // Update the local state to reflect the change in status
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.orderID === orderID ? { ...order, orderStatus: 'delivered' } : order
+        )
+      );
+
+      alert('Order marked as delivered.');
+    } catch (error) {
+      console.error('Error updating to delivered status:', error);
     }
   };
 
@@ -133,6 +199,21 @@ const OrderDetails = () => {
                       </button>
                     </>
                   )}
+
+           {activeTab === 'inpreparation' && (
+               <>
+                <button
+                 className="prepared-btn"
+                 onClick={() => handlePrepared(order.orderID, order.userEmail)} // Pass userEmail
+                >Prepared
+                </button>
+                <button
+                 className="delivered-btn"
+                 onClick={() => handleDelivered(order.orderID)}
+                >Delivered
+              </button>
+             </>
+            )}
                 </div>
               </div>
 
